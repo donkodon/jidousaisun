@@ -1,0 +1,37 @@
+# Configuration for Replicate
+build:
+  gpu: true
+  python_version: "3.10"
+  system_packages:
+    - "libgl1-mesa-glx"
+    - "libglib2.0-0"
+    - "fontconfig"
+  python_packages:
+    - "torch==2.0.1"
+    - "torchvision==0.15.2"
+    - "numpy<2.0.0"
+    - "opencv-python-headless"
+    - "Pillow"
+    - "mim"
+    - "mmengine"
+    - "mmcv>=2.0.0"
+    - "mmdet>=3.0.0"
+    - "mmpose>=1.0.0"
+    - "scipy"
+
+  run:
+    - mkdir -p /root/.cache/torch/hub/checkpoints
+    # OpenMMLabのライブラリインストール (mimを使用)
+    - pip install -U openmim
+    - mim install mmcv>=2.0.0
+    - mim install mmdet>=3.0.0
+    - mim install mmpose>=1.0.0
+    # DeepFashion2モデルの事前ダウンロード (キャッシュ化)
+    # ここでは代表的なモデル構成をダウンロードします
+    # Config: td-hm_hrnet-w48_8xb32-210e_deepfashion2-256x192.py
+    # Checkpoint: td-hm_hrnet-w48_8xb32-210e_deepfashion2-256x192-0e097d67_20220922.pth
+    - mkdir -p weights
+    - wget -O weights/td-hm_hrnet-w48_8xb32-210e_deepfashion2-256x192.py https://raw.githubusercontent.com/open-mmlab/mmpose/main/configs/body_2d_keypoint/topdown_heatmap/deepfashion2/td-hm_hrnet-w48_8xb32-210e_deepfashion2-256x192.py
+    - wget -O weights/checkpoint.pth https://download.openmmlab.com/mmpose/v1/body_2d_keypoint/topdown_heatmap/deepfashion2/td-hm_hrnet-w48_8xb32-210e_deepfashion2-256x192-0e097d67_20220922.pth
+
+predict: "predict.py:Predictor"
